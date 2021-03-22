@@ -47,7 +47,7 @@ resource "aws_security_group" "web" {
 # Создаём Launch Configuration - это сущность, которая определяет конфигурацию запускаемых серверов. Размер, , 
 
 resource "aws_launch_configuration" "web" {
-  name_prefix     = "NGINX-server-"
+  name_prefix     = "NGINX-"
   # какой будет использоваться образ
   image_id        = data.aws_ami.ubuntu.id
   # Размер машины (CPU и память)
@@ -96,7 +96,7 @@ resource "aws_autoscaling_group" "web" {
 
 # Elastic Load Balancer проксирует трафик на наши сервера 
 resource "aws_elb" "web" {
-  name               = "Nginx-Server-Highly-Available-ELB"
+  name               = "Nginx-Highly-Available-ELB"
   # перенаправляет трафик на несколько Дата центров
   availability_zones = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
   security_groups    = [aws_security_group.web.id]
@@ -115,7 +115,7 @@ resource "aws_elb" "web" {
     interval            = 70
   }
   tags = {
-    Name = "Nginx-Server-Highly-Available-ELB"
+    Name = "Nginx-Highly-Available-ELB"
   }
 }
 
