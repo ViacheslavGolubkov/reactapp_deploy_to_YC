@@ -1,0 +1,99 @@
+---
+
+- name: "Delete default site"
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: "YARN | GPG"
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+    state: present
+  
+- name: "Yarn | Ensure list"
+  file:
+    path: /etc/apt/sources.list.d/yarn.list
+    owner: root
+    mode: 0644
+    state: touch
+
+- name: "YARN | Add line to list"
+  lineinfile:
+    dest: /etc/apt/sources.list.d/yarn.list
+    regexp: 'deb http://dl.yarnpkg.com/debian/ stable main'
+    line: 'deb http://dl.yarnpkg.com/debian/ stable main'
+    state: present
+
+- name: "YARN | APT cache update"
+  apt:
+    update_cache: yes
+
+- name: "Install packages"
+  apt:
+    name: 
+      - yarn
+      - npm
+      - nodejs
+      - git
+    state: present
+
+- name: "Set variables"
+  set_fact:
+    release_path: "{{ project_path }}/releases/{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+
+- name: "Create project path"
+  file:
+    dest: "{{ project_path }}"
+    owner: root
+    mode: 0755
+    recurse: yes
+    state: directory
+
+- name: "Create release path"
+  file:
+    dest: "{{ release_path }}"
+    owner: root
+    mode: 0755
+    recurse: yes
+    state: directory
+
+- name: "Clone repo"
+  git:
+    repo: "{{ repository }}"
+    dest: "{{ release_path }}"
+
+- name: Add IP address of instance to main site 
+  replace:
+    path: "{{ release_path }}/src/App.js"
+    regexp: 'Test of revert'
+    replace: '{{ ansible_default_ipv4.address }}'
+    backup: yes
+
+- name: Yarn install app pm2
+  yarn:
+    name: pm2
+    state: present
+    global: yes
+
+- name: Install packages based on package.json.
+  npm:
+    path: "{{ release_path }}"
+
+- name: YARN install
+  command: "yarn install"
+  args:
+    chdir: "{{ release_path }}"
+    
+- name: Yarn Build
+  command: "yarn build"
+  args:
+    chdir: "{{ release_path }}"
+  environment:
+    REACT_APP_WEBSITE_PREFIX: "Golubkov Viacheslav"
+
+- name: Start pm2
+  command: pm2 --name ReactJS start yarn --interpreter bash -- start
+  args:
+    chdir: "{{ release_path }}"
+  environment: 
+    PORT: "80"

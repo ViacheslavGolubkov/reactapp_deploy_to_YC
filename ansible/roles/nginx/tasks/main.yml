@@ -1,0 +1,31 @@
+---
+- name: "Delete default site"
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Copy cfg
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-enabled/nginx.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: Restart nginx
+
+- name: Delete hosts
+  file:
+    dest: /etc/hosts
+    state: absent
+    
+- name: Copy hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    mode: 0644
+    owner: root
+    group: root
+  notify: Restart nginx
+
+
+# tasks file for nginx

@@ -1,0 +1,4 @@
+---
+- name: Restart nginx
+  shell: "systemctl restart nginx"
+# handlers file for nginx

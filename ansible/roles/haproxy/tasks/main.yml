@@ -1,0 +1,43 @@
+---
+- name: "Delete default site"
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Install the package git
+  apt: 
+    pkg: 
+      - haproxy
+
+# - name: Clone the repository
+#   git:
+#     repo: "{{ repository }}"
+#     dest: "/home/ubuntu/repo/"
+
+- name: Delete Hosts file
+  file:
+    dest: /etc/hosts
+    state: absent
+
+- name: Delete Haproxy cfg
+  file:
+    dest: /etc/haproxy/haproxy.cfg
+    state: absent
+
+- name: Add Haproxy cfg
+  template:
+    src: "haproxy.cfg.j2"
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0755
+    owner: root
+    group: root
+  notify: Restart haproxy
+
+- name: Add Hosts file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    mode: 0555
+    owner: root
+  notify: Restart haproxy
+# tasks file for haproxy

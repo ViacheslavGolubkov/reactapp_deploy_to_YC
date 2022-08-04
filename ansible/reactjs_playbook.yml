@@ -1,0 +1,18 @@
+---
+- hosts: all
+  gather_facts: True
+
+- hosts: reactjs_servers
+  become: yes
+  roles:
+    - reactjs_deploy
+
+- hosts: nginx_servers
+  become: yes
+  roles:
+  - nginx
+
+- hosts: haproxy_server
+  become: yes
+  roles:
+    - haproxy

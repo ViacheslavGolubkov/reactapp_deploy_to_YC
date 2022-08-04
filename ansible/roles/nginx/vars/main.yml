@@ -1,0 +1,4 @@
+---
+reactjs_host_ip: 192.168.10.13
+reactjs_host_port: 80
+# vars file for nginx

@@ -1,0 +1,9 @@
+[nginx_servers]
+nginx_1 ansible_host=51.250.67.243
+nginx_2 ansible_host=51.250.10.156
+
+[reactjs_servers]
+react_js_1 ansible_host=51.250.90.20
+
+[haproxy_server]
+haproxy_1 ansible_host=51.250.72.250
